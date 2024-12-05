@@ -5,7 +5,8 @@ import os
 import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 #global variables
 data_folder ="data"
 test_csv_name = "or_test.csv"
@@ -139,11 +140,17 @@ print("|========================================================================
 all_data['Work_Experience_Missing'] = all_data['Work_Experience'].notna().astype(float)
 all_data['Work_Experience'] = all_data['Work_Experience'].fillna(all_data['Work_Experience'].mean())
 all_data.reset_index(drop=True, inplace=True)
-print("|=======================================================================|")
-# containing any values
-
-
 train_data, test_data = train_test_split(all_data, test_size=0.2, random_state=42)
 
-print(f"Train data shape: {train_data.shape}")
-print(f"Test data shape: {test_data.shape}")
+
+# Create the histogram
+plt.hist(all_data['Graduated'], bins=30, edgecolor='black')
+
+# Add title and labels
+plt.title('Histogram of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+
+# Show the plot
+plt.show()
+plt.close()
