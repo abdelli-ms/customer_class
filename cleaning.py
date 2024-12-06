@@ -5,8 +5,6 @@ import os
 import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import seaborn as sns
 #global variables
 data_folder ="data"
 test_csv_name = "or_test.csv"
@@ -108,10 +106,10 @@ cat_dtypes.update(columns_dtypes)
 all_data = read_all_data(data_folder,list_files,cat_dtypes)
 all_data=handle_None_cat(all_data,list_cats)
 all_data = all_data.drop_duplicates(keep="first")
-list_todummies = ["Gender","Ever_Married","Graduated","Profession","Var_1","Segmentation"]
+list_todummies = ["Gender","Ever_Married","Graduated","Profession","Var_1"]
 all_data = to_dummies(all_data,list_todummies)
 all_data["Spending_Score"]=all_data["Spending_Score"].map({'Low': 1.0, 'Average': 2.0, 'High': 3.0}).astype(float)
-cols_to_drop =["Ever_Married_No","Graduated_No","Gender_Female","Gender","Ever_Married","Graduated","Profession","Var_1","Segmentation"]
+cols_to_drop =["Ever_Married_No","Graduated_No","Gender_Female","Gender","Ever_Married","Graduated","Profession","Var_1"]
 all_data=all_data.drop(columns=cols_to_drop)
 rename_dict ={
       'Gender_Male':'Gender', 
@@ -136,21 +134,14 @@ rename_dict ={
 }
 all_data=all_data.rename(columns=rename_dict)
 cols_nulls = ["Work_Experience", "Family_Size"]# these columns are the only ones containing nulls now
-print("|========================================================================|")
 all_data['Work_Experience_Missing'] = all_data['Work_Experience'].notna().astype(float)
 all_data['Work_Experience'] = all_data['Work_Experience'].fillna(all_data['Work_Experience'].mean())
 all_data.reset_index(drop=True, inplace=True)
-train_data, test_data = train_test_split(all_data, test_size=0.2, random_state=42)
-
-
-# Create the histogram
-plt.hist(all_data['Graduated'], bins=30, edgecolor='black')
-
-# Add title and labels
-plt.title('Histogram of Age')
-plt.xlabel('Age')
-plt.ylabel('Frequency')
-
-# Show the plot
-plt.show()
-plt.close()
+all_data['Age'] = (all_data['Age'] - all_data['Age'].min()) / all_data['Age'].std()
+all_data['Work_Experience'] = (all_data['Work_Experience'] - all_data['Work_Experience'].mean()) / all_data['Work_Experience'].std()
+#splitting and saving data to parquet files
+train_data, test_data = train_test_split(all_data, test_size=0.3, random_state=42)
+test_file ='./data/test_data.parquet'
+train_file='./data/train_data.parquet'
+test_data.to_parquet(test_file, engine='pyarrow', index=False)
+train_data.to_parquet(train_file, engine='pyarrow', index=False)
