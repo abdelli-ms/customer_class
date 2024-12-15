@@ -1,3 +1,0 @@
-https://www.kaggle.com/code/mauricioasperti/automobile-customer-segmentation-classification#3.-Data-Collection
-https://www.kaggle.com/code/abhinavjhanwar/customer-segmentation-accuracy-53
-https://www.kaggle.com/code/juniorbueno/customer-k-means-hierarchical-grouping-dbscan

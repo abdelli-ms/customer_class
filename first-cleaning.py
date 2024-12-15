@@ -63,7 +63,7 @@ def to_dummies(df,list_cols):
   """
   takes a dataframe and creates dummies for list of columns that are categorical.
   input: 
-    df : adataframe
+    df : a dataframe
     list_cols : a list of columns
   output : 
     a dataframe for which each of the categorical column in the list list_cols is converted into dummy columns
@@ -99,13 +99,30 @@ def to_list_cats(df):
     if(df[column].dtype.name=="category"):
       print(column,df[column].cat.categories)
   print("------------------------------")
-
-  
+def num_normalization(dataf,cols):
+  """
+  a function to clean numerical columns
+  input:
+  dataf: dataframe
+  cols: the columns to normalize
+  output:
+  return the dataframe with filtered data
+  """
+  for col in cols:
+    if(dataf[col].dtype.name!="float64"):
+      print(f"<{col}> is not of type flaot")
+      continue
+    if(not dataf[col].isna().any()):
+      dataf[f"{col}_Unknown"]=0.0
+    else:
+      dataf[f"{col}_Unknown"]=dataf[col].isna().astype(float)
+    #dataf[col] = (dataf[col] - dataf[col].min()) / dataf[col].std()
+    dataf[col] = dataf[col].fillna(dataf[col].mean())
+  return dataf
 list_cats=["Gender","Ever_Married","Graduated","Profession","Spending_Score","Var_1","Segmentation"]
 cat_dtypes.update(columns_dtypes)
 all_data = read_all_data(data_folder,list_files,cat_dtypes)
 all_data=handle_None_cat(all_data,list_cats)
-all_data = all_data.drop_duplicates(keep="first")
 list_todummies = ["Gender","Ever_Married","Graduated","Profession","Var_1"]
 all_data = to_dummies(all_data,list_todummies)
 all_data["Spending_Score"]=all_data["Spending_Score"].map({'Low': 1.0, 'Average': 2.0, 'High': 3.0}).astype(float)
@@ -133,15 +150,15 @@ rename_dict ={
        'Var_1_Cat_7':'Cat_7',
 }
 all_data=all_data.rename(columns=rename_dict)
-cols_nulls = ["Work_Experience", "Family_Size"]# these columns are the only ones containing nulls now
-all_data['Work_Experience_Missing'] = all_data['Work_Experience'].notna().astype(float)
-all_data['Work_Experience'] = all_data['Work_Experience'].fillna(all_data['Work_Experience'].mean())
+cols_nums = ["Work_Experience", "Age","Family_Size"]
+print(all_data.shape)
+all_data = num_normalization(all_data,cols_nums)
+all_data = all_data.drop_duplicates(keep="first")
 all_data.reset_index(drop=True, inplace=True)
-all_data['Age'] = (all_data['Age'] - all_data['Age'].min()) / all_data['Age'].std()
-all_data['Work_Experience'] = (all_data['Work_Experience'] - all_data['Work_Experience'].mean()) / all_data['Work_Experience'].std()
-#splitting and saving data to parquet files
-train_data, test_data = train_test_split(all_data, test_size=0.3, random_state=42)
+print(all_data.shape)
+train_data, test_data = train_test_split(all_data, test_size=0.3, random_state=42,stratify=all_data["Segmentation"])
 test_file ='./data/test_data.parquet'
 train_file='./data/train_data.parquet'
 test_data.to_parquet(test_file, engine='pyarrow', index=False)
 train_data.to_parquet(train_file, engine='pyarrow', index=False)
+print(all_data.columns)
