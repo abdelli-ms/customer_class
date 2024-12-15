@@ -101,7 +101,7 @@ print("accuracy:", grid_search.best_score_)
 
 best_rf = grid_search.best_estimator_
 
-feature_importances = best_rf.feature_importances_
+# feature_importances = best_rf.feature_importances_
 predictions = cross_val_predict(best_rf, X, Y, cv=custom_cv)
 
 accuracy = accuracy_score(Y, predictions)

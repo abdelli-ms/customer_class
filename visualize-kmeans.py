@@ -75,27 +75,27 @@ def plot_correlation_heatmap(correlation_matrix):
 
 data_path="./data/train.parquet"
 data = pd.read_parquet(data_path)
-cols_age=["Age","Log_Age","Age_2","Age_Normalized","Log_Age_Normalized"]# hue Age_Uknown
+cols_age=["Age","Log_Age","Age_2","Age_Normalized","Log_Age_Normalized"]
 cols_work=["Work_Experience","Work_Experience_2","Log_Work_Experience"]
 cat_s=["Cat_1","Cat_2","Cat_3","Cat_4","Cat_5","Cat_6","Ever_Married","Ever_Married_Unknown",
 "Artist","Doctor",'Engineer', 'Entertainment', 'Executive','Gender', 'Graduated','Graduated_Unknown',
 'Healthcare', 'Homemaker', 'Lawyer','Marketing', 'Profession_Unknown']
-cols_fam=["Family_Size","Family_Size_2"]# do we need a log ? I don't think so
+cols_fam=["Family_Size","Family_Size_2"]
 cols_WA=["Log_Age_Exp","Age_Exp","Age_Exp_2"]
 cols_spending=["Spending_Score_Age", "Spending_Score_Age_2", "Log_Spending_Score_Age"]
 
-kmeans = KMeans(n_clusters=4, random_state=0)  # Adjust clusters as needed
+kmeans = KMeans(n_clusters=4, random_state=0)
 X=data.drop(columns="Segmentation")
 cluster_labels = kmeans.fit_predict(X)
 X['Cluster_Labels'] = cluster_labels
 joblib.dump(kmeans, 'kmeans_model.pkl')
 
 #decomment for figures
-# plot_column_distributions(data, columns=cols_age)
+plot_column_distributions(data, columns=cols_age)
 # "Normalized Age"
 
 # work experience
-# plot_column_distributions(data,columns=cols_work)
+plot_column_distributions(data,columns=cols_work)
 
 #fam size
 # plot_column_distributions(data,columns=cols_fam)
