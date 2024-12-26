@@ -5,11 +5,7 @@ import os
 import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
-#global variables
-data_folder ="data"
-test_csv_name = "or_test.csv"
-train_csv_name = "or_train.csv"
-list_files = [test_csv_name,train_csv_name]
+
 def read_all_data(relative_ddir_name,list_dir_names,type_dict):
   """
   this function reads data from multiple files into a single dataframe
@@ -76,20 +72,7 @@ def to_dummies(df,list_cols):
       df_dummies=df_dummies.astype(float)
       df = pd.concat([df, df_dummies], axis=1)
   return df
-cat_dtypes = defaultdict(lambda : "object")
-columns_dtypes = {
-  "ID":"object",
-  "Gender":"category",
-  "Ever_Married":"category",
-  "Age": "float64",
-  "Graduated":"category",
-  "Profession":"category",
-  "Work_Experience":"float64",
-  "Spending_Score":"category",
-  "Family_Size":"float64",
-  "Var_1":"category",
-  "Segmentation":"category",
-}
+
 def to_list_cats(df):
   """
   a debugging function, takes a dataframe and prints the values of the categories for each category column
@@ -119,6 +102,26 @@ def num_normalization(dataf,cols):
     #dataf[col] = (dataf[col] - dataf[col].min()) / dataf[col].std()
     dataf[col] = dataf[col].fillna(dataf[col].mean())
   return dataf
+
+#global variables
+data_folder ="data"
+test_csv_name = "or_test.csv"
+train_csv_name = "or_train.csv"
+list_files = [test_csv_name,train_csv_name]
+cat_dtypes = defaultdict(lambda : "object")
+columns_dtypes = {
+  "ID":"object",
+  "Gender":"category",
+  "Ever_Married":"category",
+  "Age": "float64",
+  "Graduated":"category",
+  "Profession":"category",
+  "Work_Experience":"float64",
+  "Spending_Score":"category",
+  "Family_Size":"float64",
+  "Var_1":"category",
+  "Segmentation":"category",
+}
 list_cats=["Gender","Ever_Married","Graduated","Profession","Spending_Score","Var_1","Segmentation"]
 cat_dtypes.update(columns_dtypes)
 all_data = read_all_data(data_folder,list_files,cat_dtypes)
@@ -151,14 +154,11 @@ rename_dict ={
 }
 all_data=all_data.rename(columns=rename_dict)
 cols_nums = ["Work_Experience", "Age","Family_Size"]
-print(all_data.shape)
 all_data = num_normalization(all_data,cols_nums)
 all_data = all_data.drop_duplicates(keep="first")
 all_data.reset_index(drop=True, inplace=True)
-print(all_data.shape)
 train_data, test_data = train_test_split(all_data, test_size=0.3, random_state=42,stratify=all_data["Segmentation"])
 test_file ='./data/test_data.parquet'
 train_file='./data/train_data.parquet'
 test_data.to_parquet(test_file, engine='pyarrow', index=False)
 train_data.to_parquet(train_file, engine='pyarrow', index=False)
-print(all_data.columns)
