@@ -47,14 +47,13 @@ def print_value_counts(df, columns):
 def print_value_counts_by_target(df, columns, target_col):
   for col in columns:
     print(f"Value counts for column: {col} grouped by {target_col}")
-    counts = df.groupby(target_col)[col].value_counts().unstack(fill_value=0)
+    counts = df.groupby(target_col,observed=False)[col].value_counts().unstack(fill_value=0)
     print(counts)
     print("-" * 40)
 def correlation(df, output_csv_path):
     correlation_matrix = df.corr()
     correlation_matrix.to_csv(output_csv_path, index=True, header=True)
-import seaborn as sns
-import matplotlib.pyplot as plt
+
 
 def plot_correlation_heatmap(correlation_matrix):
   n = len(correlation_matrix.columns)
@@ -91,11 +90,11 @@ X['Cluster_Labels'] = cluster_labels
 joblib.dump(kmeans, 'kmeans_model.pkl')
 
 #decomment for figures
-plot_column_distributions(data, columns=cols_age)
+# plot_column_distributions(data, columns=cols_age)
 # "Normalized Age"
 
 # work experience
-plot_column_distributions(data,columns=cols_work)
+# plot_column_distributions(data,columns=cols_work)
 
 #fam size
 # plot_column_distributions(data,columns=cols_fam)
@@ -119,10 +118,10 @@ print("Number of missing values for Var_1:", (data['Var_1_Unknown'] == 1.0).sum(
 print("Number of missing values for Work Experience:", (data['Work_Experience_Unknown'] == 1.0).sum())
 
 
-# 
-encoder = LabelEncoder()
-X["Cluster_Labels"] = encoder.fit_transform(X["Cluster_Labels"])
 
-correlation_matrix = X.corr()
-plot_correlation_heatmap(correlation_matrix)
-print(X.columns)
+# encoder = LabelEncoder()
+# X["Cluster_Labels"] = encoder.fit_transform(X["Cluster_Labels"])
+
+# correlation_matrix = X.corr()
+# plot_correlation_heatmap(correlation_matrix)
+# print(X.columns)
